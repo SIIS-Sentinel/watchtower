@@ -1,0 +1,8 @@
+# VSCode files
+.vscode/
+
+# Watchtower output file
+out.csv
+
+# PyCache
+__pycache__/
