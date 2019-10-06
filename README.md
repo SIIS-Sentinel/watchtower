@@ -11,11 +11,13 @@ The configuration is stored in the `config.py` file. The available parameters ar
   * `path`: absolute path to the file to read
   * `name`: name of the corresponding header column
   * `unit`: unit of the value
+  * `differential`: whether the measurement should be substracted to the previous one (e.g. network traffic)
 
 ## Example of `files` entry
 
 
     {"path": "/path/to/file",
         "name": "Example value",
-        "unit": "kB"
+        "unit": "kB",
+        "differential": 0
     }
