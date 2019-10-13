@@ -6,3 +6,6 @@ out.csv
 
 # PyCache
 __pycache__/
+
+# Pipenv lock file
+Pipfile.lock
