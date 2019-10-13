@@ -9,6 +9,7 @@ verify_ssl = true
 pylint = "*"
 autopep8 = "*"
 pandas = "*"
+paho-mqtt = "*"
 
 [requires]
 python_version = "3.6"
