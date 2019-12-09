@@ -14,7 +14,7 @@ nb_std = 4
 client_name = "/sentinel/node_1"
 
 # MQTT broker address
-broker_addr = "192.168.84.161"
+broker_addr = "10.0.0.116"
 
 # Info about all files to sample
 files: list = [
@@ -108,25 +108,25 @@ files: list = [
         "topic": "/nb_processes",
         "differential": 0},
 
-    {"path": "/sys/class/net/ens33/statistics/rx_bytes",
+    {"path": "/sys/class/net/wlan0/statistics/rx_bytes",
         "name": "Number of bytes received",
         "unit": "bytes",
         "topic": "/rx_bytes",
         "differential": 1},
 
-    {"path": "/sys/class/net/ens33/statistics/tx_bytes",
+    {"path": "/sys/class/net/wlan0/statistics/tx_bytes",
         "name": "Number of bytes sent",
         "unit": "bytes",
         "topic": "/tx_bytes",
         "differential": 1},
 
-    {"path": "/sys/class/net/ens33/statistics/rx_packets",
+    {"path": "/sys/class/net/wlan0/statistics/rx_packets",
         "name": "Number of packets received",
         "unit": "N/A",
         "topic": "/rx_packets",
         "differential": 1},
 
-    {"path": "/sys/class/net/ens33/statistics/tx_packets",
+    {"path": "/sys/class/net/wlan0/statistics/tx_packets",
         "name": "Number of packets sent",
         "unit": "N/A",
         "topic": "/tx_packets",
