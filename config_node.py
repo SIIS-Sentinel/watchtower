@@ -14,7 +14,7 @@ nb_std = 4
 client_name = "/sentinel/node_1"
 
 # MQTT broker address
-broker_addr = "10.0.0.116"
+broker_addr = "hub.local"
 
 # Info about all files to sample
 files: list = [
