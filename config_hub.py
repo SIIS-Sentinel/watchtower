@@ -14,7 +14,15 @@ nb_std = 4
 client_name = "/sentinel/hub"
 
 # MQTT broker address
-broker_addr = "192.168.84.161"
+broker_addr = "hub"
+
+# Root CA path
+ca_cert = "certs/yubikey.crt"
+
+# Client certificate and key paths
+certfile = "certs/watchtower_hub.crt"
+keyfile = "certs/watchtower_hub.key"
+
 
 # Info about all files to sample
 files: list = [

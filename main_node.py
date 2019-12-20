@@ -30,9 +30,6 @@ class Entry():
 
 def on_connect(client: mqtt.Client, userdata, flags, rc):
     print("Connected to MQTT server at %s" % (broker_addr))
-    print("Starting the sampling with a period of %.0fs" % sample_period)
-    start_time = time.time()
-    sample(entries, delta_t, client, 1)
 
 
 def load_entries(files: list = files) -> list:
@@ -103,10 +100,13 @@ def start_sampling(files: list = files, delta_t: float = sample_period) -> None:
     print("Connecting to MQTT broker")
     client = mqtt.Client(client_name)
     client.on_connect = on_connect
-    client.tls_set(ca_certs="certs/yubikey.crt",
-                   certfile="certs/watchtower_node.crt",
-                   keyfile="certs/watchtower_node.key")
+    client.tls_set(ca_certs=ca_cert,
+                   certfile=certfile,
+                   keyfile=keyfile)
     client.connect(broker_addr, port=8883)
+    print("Starting the sampling with a period of %.0fs" % sample_period)
+    start_time = time.time()
+    sample(entries, delta_t, client, 1)
 
 
 # Start polling the files

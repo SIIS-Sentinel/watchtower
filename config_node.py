@@ -16,6 +16,14 @@ client_name = "/sentinel/node_1"
 # MQTT broker address
 broker_addr = "hub.local"
 
+# Root CA path
+ca_cert = "certs/yubikey.crt"
+
+# Client certificate and key paths
+certfile = "certs/watchtower_node.crt"
+keyfile = "certs/watchtower_node.key"
+
+
 # Info about all files to sample
 files: list = [
     {"path": "/sys/kernel/sentinel/nb_cpus",

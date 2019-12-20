@@ -64,8 +64,11 @@ def on_log(client, userdata, level, buf):
 
 
 client = mqtt.Client(client_name)
+client.tls_set(ca_certs=ca_cert,
+               certfile=certfile,
+               keyfile=keyfile)
 client.on_connect = on_connect
 client.on_log = on_log
 client.on_message = on_message
-client.connect(broker_addr)
+client.connect(broker_addr, port=8883)
 client.loop_forever()
