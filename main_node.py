@@ -30,6 +30,19 @@ class Entry():
 
 def on_connect(client: mqtt.Client, userdata, flags, rc):
     print("Connected to MQTT server at %s" % (broker_addr))
+    client.subscribe(client_name + "/sample_period")
+
+
+def on_message(client: mqtt.Client, userdata, message: mqtt.Message):
+    global sample_period
+    # Check if this is a message that changes the sample period
+    if message.topic == client_name + "/sample_period":
+        message_data: str = message.payload.decode()
+        message_float: float = float(message_data)
+        sample_period = message_float
+    else:
+        # This should not happen, we are not subscribed to anything else
+        print("Unexpected message received, channel: %s" % message.topic)
 
 
 def load_entries(files: list = files) -> list:
@@ -64,9 +77,6 @@ def sample(entries: list, delta_t: float, client: mqtt.Client = client, initial_
                 entry.previous_raw = raw
             else:
                 val_buf = float(file.readline().split()[0])
-            # if is_outlier(entry, val_buf):
-            #     print("Outlier detected for metric %s (avg: %.02f, std: %.02f, value: %.02f)" % (
-            #         entry.name, entry.average, entry.std, val_buf))
             message = json.dumps(
                 {"value": val_buf, "unit": entry.unit, "ts": samples[0], "std": entry.std, "average": entry.average})
             client.publish(client_name + entry.topic, message)
@@ -100,6 +110,7 @@ def start_sampling(files: list = files, delta_t: float = sample_period) -> None:
     print("Connecting to MQTT broker")
     client = mqtt.Client(client_name)
     client.on_connect = on_connect
+    client.on_message = on_message
     client.tls_set(ca_certs=ca_cert,
                    certfile=certfile,
                    keyfile=keyfile)
