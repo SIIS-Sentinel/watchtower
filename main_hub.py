@@ -26,6 +26,12 @@ def is_outlier(sensor: Sensor, value: float):
     return (value > sensor.average + nb_std * sensor.std) or (value < sensor.average - nb_std * sensor.std)
 
 
+def update_sample_period(client: mqtt.Client, node_name: str, new_period: float):
+    print("Changing the sample period of node %s to %0.1f" %
+          (node_name, new_period))
+    client.publish(node_name + "/sample_period", str(new_period))
+
+
 def on_connect(client: mqtt.Client, userdata, flags, rc):
     print("Connected to broker at %s" % broker_addr)
     client.subscribe("/nodes")
