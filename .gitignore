@@ -9,3 +9,6 @@ __pycache__/
 
 # Pipenv lock file
 Pipfile.lock
+
+# Key files
+*.key

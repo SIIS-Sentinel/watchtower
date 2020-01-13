@@ -100,7 +100,10 @@ def start_sampling(files: list = files, delta_t: float = sample_period) -> None:
     print("Connecting to MQTT broker")
     client = mqtt.Client(client_name)
     client.on_connect = on_connect
-    client.connect(broker_addr)
+    client.tls_set(ca_certs=ca_cert,
+                   certfile=certfile,
+                   keyfile=keyfile)
+    client.connect(broker_addr, port=8883)
     print("Starting the sampling with a period of %.0fs" % sample_period)
     start_time = time.time()
     sample(entries, delta_t, client, 1)
