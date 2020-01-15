@@ -33,7 +33,7 @@ def on_connect(client: mqtt.Client, userdata, flags, rc):
     client.subscribe(client_name + "/sample_period")
 
 
-def on_message(client: mqtt.Client, userdata, message: mqtt.Message):
+def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
     global sample_period
     # Check if this is a message that changes the sample period
     if message.topic == client_name + "/sample_period":

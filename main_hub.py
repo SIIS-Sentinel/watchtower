@@ -143,7 +143,8 @@ def get_node_id(name: str):
 
 def get_sensor_id(name: str, node: str):
     node_id = session.query(Node.id).filter_by(name=node)
-    sensor = session.query(Sensor.id).filter_by(name=name)
+    sensor = session.query(Sensor.id).filter_by(
+        name=name).filter_by(node_id=node_id)
     return sensor[0].id
 
 
