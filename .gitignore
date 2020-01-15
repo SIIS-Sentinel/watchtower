@@ -12,3 +12,6 @@ Pipfile.lock
 
 # Key files
 *.key
+
+# SQLite DB
+data.db
