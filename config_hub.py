@@ -24,6 +24,9 @@ ca_cert = "certs/yubikey.crt"
 certfile = "certs/watchtower_hub.crt"
 keyfile = "certs/watchtower_hub.key"
 
+# DB path
+db_path = "postgresql://pi:password@localhost/watchtower"
+
 # Info about all files to sample
 files: list = [
     {"path": "/sys/kernel/sentinel/nb_cpus",

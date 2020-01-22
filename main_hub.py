@@ -87,7 +87,7 @@ Sensor.measurements = relationship(
 
 
 # Create and connect to the database
-engine = create_engine('sqlite:///data.db')
+engine = create_engine(db_path)
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
