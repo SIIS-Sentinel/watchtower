@@ -6,6 +6,7 @@ import ssl
 from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import SQLAlchemyError
 
 # Global variables
 nodes: dict = {}
@@ -63,7 +64,7 @@ class Sensor(Base):
 
 
 Node.sensors = relationship(
-    "Sensor", order_by=Sensor.id, back_populates="node")
+    "Sensor", back_populates="node")
 
 
 class Measurement(Base):
@@ -93,9 +94,9 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-def is_outlier(sensor: Sensor, value: float):
+def is_outlier(sensor: SensorJSON, value: float):
     if (sensor.average is None or sensor.std is None):
-        print("Data missing for an outlier detection")
+        # print("Data missing for an outlier detection")
         return False
     return (value > sensor.average + nb_std * sensor.std) or (value < sensor.average - nb_std * sensor.std)
 
@@ -142,9 +143,13 @@ def get_node_id(name: str):
 
 
 def get_sensor_id(name: str, node: str):
-    node_id = session.query(Node.id).filter_by(name=node)
+    node_id = session.query(Node.id).filter_by(name=node).all()
     sensor = session.query(Sensor.id).filter_by(
-        name=name).filter_by(node_id=node_id)
+        name=name).all()
+    # sensor = session.query(Sensor.id).filter_by(
+    #     name=name).filter_by(node_id=node_id).all()
+    if len(sensor) == 0:
+        return 0
     return sensor[0].id
 
 
@@ -157,6 +162,7 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
     global nodes
     if (message.topic == "/nodes"):
         # Message announcing a node
+        print("node")
         node_topic: str = message.payload.decode()
         node_name = node_topic.split("/")[2]
         if (node_name not in nodes):
@@ -174,12 +180,12 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         sensor_id = get_sensor_id(sensor_name, node_name)
         if (sensor_name not in nodes[node_name]):
             print("Found new sensor (%s) for the node" % sensor_name)
-            sensor: Sensor = SensorJSON(message_json)
+            sensor: SensorJSON = SensorJSON(message_json)
             sensor.name = sensor_name
             nodes[node_name][sensor_name] = sensor
             add_sensor(sensor_name, sensor.unit,
                        sensor.average, sensor.std, node_id)
-        sensor: Sensor = nodes[node_name][sensor_name]
+        sensor: SensorJSON = nodes[node_name][sensor_name]
         value = float(message_json["value"])
         add_measurement(sensor.ts, value, sensor_id, node_id)
         if (is_outlier(sensor, value=value)):

@@ -1,4 +1,4 @@
-# Watchtower sample period (in s)
+# Watchtower sample period(in s)
 sample_period: float = 1
 
 # Output CSV file path (relative to the executable, or absolute)
@@ -26,6 +26,7 @@ keyfile = "certs/watchtower_hub.key"
 
 # DB path
 db_path = "postgresql://pi:password@localhost/watchtower"
+# db_path = "sqlite:///test.db"
 
 # Info about all files to sample
 files: list = [
