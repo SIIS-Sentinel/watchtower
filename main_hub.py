@@ -3,14 +3,10 @@ import csv
 import paho.mqtt.client as mqtt
 import json
 import ssl
-from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import SQLAlchemyError
+from sql import session, Node, Measurement, Event, Sensor
 
 # Global variables
 nodes: dict = {}
-Base = declarative_base()
 
 
 class SensorJSON():
@@ -23,66 +19,6 @@ class SensorJSON():
         self.average = entry["average"]
         self.std = entry["std"]
         self.ts = entry["ts"]
-
-
-class Node(Base):
-    __tablename__ = "nodes"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
-    events = relationship("Event", back_populates="node")
-    sensors = relationship("Sensor", back_populates="node")
-    measurements = relationship("Measurement", back_populates="node")
-
-    def __repr__(self):
-        return "Node(%s)" % (self.name)
-
-
-class Event(Base):
-    __tablename__ = "events"
-    id = Column(Integer, primary_key=True)
-    event_type = Column(String)
-    timestamp = Column(Float)
-    node_id = Column(Integer, ForeignKey('nodes.id'))
-    node = relationship("Node", back_populates="events")
-
-    def __repr__(self):
-        return "Event(%s, %s, %0.1f)" % (self.node, self.event_type, self.timestamp)
-
-
-class Sensor(Base):
-    __tablename__ = "sensors"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    unit = Column(String)
-    average = Column(Float)
-    std = Column(Float)
-    node_id = Column(Integer, ForeignKey('nodes.id'))
-    node = relationship("Node", back_populates="sensors")
-    measurements = relationship("Measurement",  back_populates="sensor")
-
-    def __repr__(self):
-        return "Sensor(%s, %s, %s, %0.2f, %0.2f)" % (self.node, self.name, self.unit, self.average, self.std)
-
-
-class Measurement(Base):
-    __tablename__ = "measurements"
-    id = Column(Integer, primary_key=True)
-    timestamp = Column(Float)
-    value = Column(Float)
-    sensor_id = Column(Integer, ForeignKey("sensors.id"))
-    sensor = relationship("Sensor", back_populates="measurements")
-    node_id = Column(Integer, ForeignKey('nodes.id'))
-    node = relationship("Node", back_populates="measurements")
-
-    def __repr__(self):
-        return "Measurement(%s, %s, %0.1f, %f)" % (self.node, self.sensor, self.timestamp, self.value)
-
-
-# Create and connect to the database
-engine = create_engine(db_path)
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
 
 
 def is_outlier(sensor: SensorJSON, value: float):
@@ -140,11 +76,9 @@ def get_node_id(name: str):
 
 
 def get_sensor_id(name: str, node: str):
-    node_id = session.query(Node.id).filter_by(name=node).all()
+    node_id = session.query(Node.id).filter_by(name=node).all()[0].id
     sensor = session.query(Sensor.id).filter_by(
-        name=name).all()
-    # sensor = session.query(Sensor.id).filter_by(
-    #     name=name).filter_by(node_id=node_id).all()
+        name=name, node_id=node_id).all()
     if len(sensor) == 0:
         return 0
     return sensor[0].id
@@ -193,7 +127,7 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
 
 
 def on_log(client, userdata, level, buf):
-    # print("Log: %s" % (buf))
+    print("Log: %s" % (buf))
     pass
 
 
