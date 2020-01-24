@@ -119,8 +119,9 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
                        sensor.average, sensor.std, node_id)
         sensor_id: int = get_sensor_id(sensor_name, node_name)
         sensor: SensorJSON = nodes[node_name][sensor_name]
+        ts: float = float(message_json["ts"])
         value = float(message_json["value"])
-        add_measurement(sensor.ts, value, sensor_id, node_id)
+        add_measurement(ts, value, sensor_id, node_id)
         if (is_outlier(sensor, value=value)):
             print("Outlier detected: %s (value: %.02f, average: %.02f, std: %.02f)" %
                   (sensor.name, value, sensor.average, sensor.std))
