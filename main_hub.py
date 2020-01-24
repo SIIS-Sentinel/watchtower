@@ -29,6 +29,9 @@ class Node(Base):
     __tablename__ = "nodes"
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
+    events = relationship("Event", back_populates="node")
+    sensors = relationship("Sensor", back_populates="node")
+    measurements = relationship("Measurement", back_populates="node")
 
     def __repr__(self):
         return "Node(%s)" % (self.name)
@@ -46,9 +49,6 @@ class Event(Base):
         return "Event(%s, %s, %0.1f)" % (self.node, self.event_type, self.timestamp)
 
 
-Node.events = relationship("Event", order_by=Event.id, back_populates="node")
-
-
 class Sensor(Base):
     __tablename__ = "sensors"
     id = Column(Integer, primary_key=True)
@@ -58,33 +58,24 @@ class Sensor(Base):
     std = Column(Float)
     node_id = Column(Integer, ForeignKey('nodes.id'))
     node = relationship("Node", back_populates="sensors")
+    measurements = relationship("Measurement",  back_populates="sensor")
 
     def __repr__(self):
         return "Sensor(%s, %s, %s, %0.2f, %0.2f)" % (self.node, self.name, self.unit, self.average, self.std)
 
 
-Node.sensors = relationship(
-    "Sensor", back_populates="node")
-
-
 class Measurement(Base):
     __tablename__ = "measurements"
     id = Column(Integer, primary_key=True)
-    sensor_id = Column(Integer, ForeignKey("sensors.id"))
-    sensor = relationship("Sensor", back_populates="measurements")
     timestamp = Column(Float)
     value = Column(Float)
+    sensor_id = Column(Integer, ForeignKey("sensors.id"))
+    sensor = relationship("Sensor", back_populates="measurements")
     node_id = Column(Integer, ForeignKey('nodes.id'))
     node = relationship("Node", back_populates="measurements")
 
     def __repr__(self):
         return "Measurement(%s, %s, %0.1f, %f)" % (self.node, self.sensor, self.timestamp, self.value)
-
-
-Node.measurements = relationship(
-    "Measurement", order_by=Measurement.id, back_populates="node")
-Sensor.measurements = relationship(
-    "Measurement", order_by=Measurement.id, back_populates="sensor")
 
 
 # Create and connect to the database
@@ -113,12 +104,14 @@ def add_node(name: str):
         newNode = Node(name=name)
         session.add(newNode)
         session.commit()
+        # session.flush()
 
 
 def add_event(ts: float, ev_type: str, node: int):
     newEvent = Event(timestamp=ts, event_type=ev_type, node_id=node)
     session.add(newEvent)
     session.commit()
+    # session.flush()
 
 
 def add_measurement(ts: float, value: float, sensor: int, node: int):
@@ -126,6 +119,7 @@ def add_measurement(ts: float, value: float, sensor: int, node: int):
         timestamp=ts, value=value, sensor_id=sensor, node_id=node)
     session.add(newMeasurement)
     session.commit()
+    # session.flush()
 
 
 def add_sensor(name: str, unit: str, avg: float, std: float, node: int):
@@ -135,10 +129,13 @@ def add_sensor(name: str, unit: str, avg: float, std: float, node: int):
                            std=std, node_id=node)
         session.add(newSensor)
         session.commit()
+        # session.flush()
 
 
 def get_node_id(name: str):
-    node = session.query(Node.id).filter_by(name=name)
+    node = session.query(Node.id).filter_by(name=name).all()
+    if len(node) == 0:
+        return 0
     return node[0].id
 
 
@@ -162,7 +159,6 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
     global nodes
     if (message.topic == "/nodes"):
         # Message announcing a node
-        print("node")
         node_topic: str = message.payload.decode()
         node_name = node_topic.split("/")[2]
         if (node_name not in nodes):
@@ -176,8 +172,10 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         node_name: str = message.topic.split("/")[2]
         sensor_name: str = message.topic.split("/")[3]
         message_json = json.loads(message.payload.decode("utf-8"))
+        # try:
         node_id = get_node_id(node_name)
-        sensor_id = get_sensor_id(sensor_name, node_name)
+        # except:
+        #     pass
         if (sensor_name not in nodes[node_name]):
             print("Found new sensor (%s) for the node" % sensor_name)
             sensor: SensorJSON = SensorJSON(message_json)
@@ -185,6 +183,7 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
             nodes[node_name][sensor_name] = sensor
             add_sensor(sensor_name, sensor.unit,
                        sensor.average, sensor.std, node_id)
+        sensor_id: int = get_sensor_id(sensor_name, node_name)
         sensor: SensorJSON = nodes[node_name][sensor_name]
         value = float(message_json["value"])
         add_measurement(sensor.ts, value, sensor_id, node_id)
@@ -194,7 +193,7 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
 
 
 def on_log(client, userdata, level, buf):
-    # print("Log: %s" % buf)
+    # print("Log: %s" % (buf))
     pass
 
 
