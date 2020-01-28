@@ -139,4 +139,34 @@ files: list = [
         "unit": "N/A",
         "topic": "/tx_packets",
         "differential": 1},
+
+    {"path": "/sys/kernel/sentinel/hiwater_rss",
+        "name": "RSS high watermark",
+        "unit": "Bytes",
+        "topic": "/hiwater_rss",
+        "differential": 0},
+
+    {"path": "/sys/kernel/sentinel/hiwater_vm",
+        "name": "VM high watermark",
+        "unit": "Bytes",
+        "topic": "/hiwater_vm",
+        "differential": 0},
+
+    {"path": "/sys/kernel/sentinel/nb_fds",
+        "name": "Number of file decriptors",
+        "unit": "N/A",
+        "topic": "/nb_fds",
+        "differential": 0},
+
+    {"path": "/sys/kernel/sentinel/task_size",
+        "name": "Tracked task current size",
+        "unit": "Bytes",
+        "topic": "/task_size",
+        "differential": 0},
+
+    {"path": "/sys/kernel/sentinel/tracked_pid",
+        "name": "Tracked PID",
+        "unit": "N/A",
+        "topic": "/tracked_pid",
+        "differential": 0},
 ]
