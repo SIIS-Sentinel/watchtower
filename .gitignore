@@ -15,3 +15,9 @@ Pipfile.lock
 
 # SQLite DB
 data.db
+
+# MyPy cache
+.mypy_cache/
+
+# SQLite database
+*.db

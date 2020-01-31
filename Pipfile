@@ -12,6 +12,8 @@ pandas = "*"
 paho-mqtt = "*"
 sqlalchemy = "*"
 psycopg2 = "*"
+mypy = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3"
