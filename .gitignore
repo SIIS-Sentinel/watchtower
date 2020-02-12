@@ -7,17 +7,14 @@ out.csv
 # PyCache
 __pycache__/
 
-# Pipenv lock file
-Pipfile.lock
-
 # Key files
 *.key
 
-# SQLite DB
-data.db
-
-# MyPy cache
-.mypy_cache/
-
 # SQLite database
 *.db
+
+# Certs data
+certs/
+
+# MyPy Cache
+.mypy_cache/
