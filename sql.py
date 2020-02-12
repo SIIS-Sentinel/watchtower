@@ -2,10 +2,11 @@ from config_hub import db_path
 from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import SQLAlchemyError
+
+from typing import Any
 
 
-Base = declarative_base()
+Base = declarative_base()  # type: Any
 
 
 class Node(Base):
@@ -15,6 +16,7 @@ class Node(Base):
     events = relationship("Event", back_populates="node")
     sensors = relationship("Sensor", back_populates="node")
     measurements = relationship("Measurement", back_populates="node")
+    attacks = relationship("Attack", back_populates="node")
 
     def __repr__(self):
         return "Node(%s)" % (self.name)
@@ -41,7 +43,7 @@ class Sensor(Base):
     std = Column(Float)
     node_id = Column(Integer, ForeignKey('nodes.id'))
     node = relationship("Node", back_populates="sensors")
-    measurements = relationship("Measurement",  back_populates="sensor")
+    measurements = relationship("Measurement", back_populates="sensor")
 
     def __repr__(self):
         return "Sensor(%s, %s, %s, %0.2f, %0.2f)" % (self.node, self.name, self.unit, self.average, self.std)
@@ -59,6 +61,15 @@ class Measurement(Base):
 
     def __repr__(self):
         return "Measurement(%s, %s, %0.1f, %f)" % (self.node, self.sensor, self.timestamp, self.value)
+
+
+class Attack(Base):
+    __tablename__ = "attacks"
+    id = Column(Integer, primary_key=True)
+    timestamp = Column(Float)
+    attack_type = Column(Integer)
+    node_id = Column(Integer, ForeignKey('nodes.id'))
+    node = relationship("Node", back_populates="attacks")
 
 
 # Create and connect to the database
