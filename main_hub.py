@@ -35,7 +35,7 @@ def update_sample_period(client: mqtt.Client, node_name: str, new_period: float)
 
 
 def add_node(name: str):
-    oldNode = session.query(Node.name.label('name')).all()
+    oldNode = session.query(Node.name).filter_by(name=name).all()
     if len(oldNode) == 0:
         newNode = Node(name=name)
         session.add(newNode)
