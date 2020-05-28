@@ -21,3 +21,26 @@ The configuration is stored in the `config.py` file. The available parameters ar
         "unit": "kB",
         "differential": 0
     }
+
+
+## Setup on a new machine
+
+* Clone this repo
+* Install `pip3`, `virtualenv`, create a virtualenv for this repo, and install all the dependencies
+
+```
+sudo apt install python3-pip
+pip3 install virtualenv
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+* Install Postgres, create a new user `pi` and a `sentinel` database
+
+```
+sudo apt install postgresql libpq-dev
+sudo su postgres
+createuser pi -P --interactive
+psql
+create database sentinel;
+```

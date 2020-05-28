@@ -15,17 +15,17 @@ client_name = "/sentinel/hub"
 
 # MQTT broker address
 # Make sure that this address is the one in the broker certificate
-broker_addr = "hub"
+broker_addr = "hass.local"
 
 # Root CA path
-ca_cert = "certs/yubikey.crt"
+ca_cert = "certs/CA.pem"
 
 # Client certificate and key paths
-certfile = "certs/watchtower_hub.crt"
-keyfile = "certs/watchtower_hub.key"
+certfile = "certs/hub.crt"
+keyfile = "certs/hub.key"
 
 # DB path
-db_path = "postgresql://pi:password@localhost/watchtower"
+db_path = "postgresql://pi:password@localhost/sentinel"
 # db_path = "sqlite:///test.db"
 
 # Info about all files to sample
