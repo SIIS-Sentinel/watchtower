@@ -18,11 +18,11 @@ broker_addr = "hub"
 # broker_addr = "hub.local"
 
 # Root CA path
-ca_cert = "certs/yubikey.crt"
+ca_cert = "/certs/CA.pem"
 
 # Client certificate and key paths
-certfile = "certs/watchtower_node.crt"
-keyfile = "certs/watchtower_node.key"
+certfile = "/certs/node.crt"
+keyfile = "/certs/node.key"
 
 
 # Info about all files to sample
