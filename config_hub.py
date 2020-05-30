@@ -15,7 +15,7 @@ client_name = "/sentinel/hub"
 
 # MQTT broker address
 # Make sure that this address is the one in the broker certificate
-broker_addr = "hass.local"
+broker_addr = "hub.local"
 
 # Root CA path
 ca_cert = "certs/CA.pem"
