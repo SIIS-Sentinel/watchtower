@@ -1,4 +1,4 @@
 #!/bin/bash
 
-dropdb watchtower
-createdb watchtower
+dropdb sentinel
+createdb sentinel

@@ -1,3 +1,4 @@
 #/bin/bash
 
-screen -S watchtower_hub -d -m pipenv run python $HOME/src/watchtower/main_hub.py
+source venv/bin/activate
+screen -S watchtower_hub -d -m python ./main_hub.py
