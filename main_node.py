@@ -24,8 +24,8 @@ class Entry():
         self.topic: str = entry["topic"]
         self.differential: bool = entry["differential"]
         self.previous_raw: float = 0
-        self.average: float
-        self.std: float
+        self.average: float = None
+        self.std: float = None
 
 
 def on_connect(client: mqtt.Client, userdata, flags, rc):
