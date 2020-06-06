@@ -15,18 +15,18 @@ client_name = "/sentinel/hub"
 
 # MQTT broker address
 # Make sure that this address is the one in the broker certificate
-broker_addr = "hub.local"
+broker_addr = "localhost"
+broker_port: int = 8883
 
 # Root CA path
-ca_cert = "certs/CA.pem"
+ca_cert = "/certs/CA.pem"
 
 # Client certificate and key paths
-certfile = "certs/hub.crt"
-keyfile = "certs/hub.key"
+certfile = "/certs/hub.crt"
+keyfile = "/certs/hub.key"
 
 # DB path
 db_path = "postgresql://pi:password@localhost/sentinel"
-# db_path = "sqlite:///test.db"
 
 # Info about all files to sample
 files: list = [

@@ -1,8 +1,6 @@
-from config_hub import *
-import csv
+import config_hub as cfg
 import paho.mqtt.client as mqtt
 import json
-import ssl
 from sql import session, Node, Measurement, Event, Sensor
 
 # Global variables
@@ -25,7 +23,7 @@ def is_outlier(sensor: SensorJSON, value: float):
     if (sensor.average is None or sensor.std is None):
         # print("Data missing for an outlier detection")
         return False
-    return (value > sensor.average + nb_std * sensor.std) or (value < sensor.average - nb_std * sensor.std)
+    return (value > sensor.average + cfg.nb_std * sensor.std) or (value < sensor.average - cfg.nb_std * sensor.std)
 
 
 def update_sample_period(client: mqtt.Client, node_name: str, new_period: float):
@@ -85,12 +83,13 @@ def get_sensor_id(name: str, node: str):
 
 
 def on_connect(client: mqtt.Client, userdata, flags, rc):
-    print("Connected to broker at %s" % broker_addr)
+    print("Connected to broker at %s" % cfg.broker_addr)
     client.subscribe("/nodes")
 
 
 def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
     global nodes
+    node_name: str
     if (message.topic == "/nodes"):
         # Message announcing a node
         node_topic: str = message.payload.decode()
@@ -103,22 +102,23 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
             add_node(node_name)
     else:
         # Message announcing a sensor measurement
-        node_name: str = message.topic.split("/")[2]
+        node_name = message.topic.split("/")[2]
         sensor_name: str = message.topic.split("/")[3]
         message_json = json.loads(message.payload.decode("utf-8"))
         # try:
         node_id = get_node_id(node_name)
         # except:
         #     pass
+        sensor: SensorJSON
         if (sensor_name not in nodes[node_name]):
             print("Found new sensor (%s) for the node" % sensor_name)
-            sensor: SensorJSON = SensorJSON(message_json)
+            sensor = SensorJSON(message_json)
             sensor.name = sensor_name
             nodes[node_name][sensor_name] = sensor
             add_sensor(sensor_name, sensor.unit,
                        sensor.average, sensor.std, node_id)
         sensor_id: int = get_sensor_id(sensor_name, node_name)
-        sensor: SensorJSON = nodes[node_name][sensor_name]
+        sensor = nodes[node_name][sensor_name]
         ts: float = float(message_json["ts"])
         value = float(message_json["value"])
         add_measurement(ts, value, sensor_id, node_id)
@@ -133,12 +133,12 @@ def on_log(client, userdata, level, buf):
 
 
 # Create and connect the MQTT client
-client = mqtt.Client(client_name)
-client.tls_set(ca_certs=ca_cert,
-               certfile=certfile,
-               keyfile=keyfile)
+client = mqtt.Client(cfg.client_name)
+client.tls_set(ca_certs=cfg.ca_cert,
+               certfile=cfg.certfile,
+               keyfile=cfg.keyfile)
 client.on_connect = on_connect
 client.on_log = on_log
 client.on_message = on_message
-client.connect(broker_addr, port=8883)
+client.connect(cfg.broker_addr, port=8883)
 client.loop_forever()
