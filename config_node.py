@@ -14,8 +14,7 @@ nb_std = 4
 client_name = "/sentinel/node_1"
 
 # MQTT broker address
-broker_addr = "hub"
-# broker_addr = "hub.local"
+broker_addr = "hub.local"
 
 # Root CA path
 ca_cert = "/certs/CA.pem"
