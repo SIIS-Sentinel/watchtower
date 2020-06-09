@@ -7,6 +7,7 @@ import statistics as st
 import pandas as pd
 import paho.mqtt.client as mqtt
 import json
+from typing import Optional
 
 # Global variables
 next_call: float = time.time()
@@ -24,8 +25,8 @@ class Entry():
         self.topic: str = entry["topic"]
         self.differential: bool = entry["differential"]
         self.previous_raw: float = 0
-        self.average: float = None
-        self.std: float = None
+        self.average: Optional[float] = None
+        self.std: Optional[float] = None
 
 
 def on_connect(client: mqtt.Client, userdata, flags, rc):
@@ -53,7 +54,9 @@ def load_entries(files: list = cfg.files) -> list:
     return entries
 
 
-def is_outlier(entry: Entry, value: float):
+def is_outlier(entry: Entry, value: float) -> bool:
+    if entry.average is None or entry.std is None:
+        return False
     return (value > entry.average + cfg.nb_std * entry.std) or (value < entry.average - cfg.nb_std * entry.std)
 
 

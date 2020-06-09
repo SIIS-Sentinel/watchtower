@@ -1,8 +1,8 @@
 import config_hub as cfg
 import paho.mqtt.client as mqtt
 import json
-from sql import session, Node, Measurement, Event, Sensor
-
+# from sql import session, Node, Measurement, Event, Sensor
+from bookkeeper.sql import create_sessions, Node, Measurement, Event, Sensor
 # Global variables
 nodes: dict = {}
 
@@ -131,6 +131,9 @@ def on_log(client, userdata, level, buf):
     print("Log: %s" % (buf))
     pass
 
+
+# Create the SQL session
+session = create_sessions(cfg.db_path)
 
 # Create and connect the MQTT client
 client = mqtt.Client(cfg.client_name)
