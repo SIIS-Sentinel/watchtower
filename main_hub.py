@@ -27,7 +27,7 @@ def is_outlier(sensor: SensorJSON, value: float):
 
 
 def update_sample_period(client: mqtt.Client, node_name: str, new_period: float):
-    print("Changing the sample period of node %s to %0.1f" %
+    print("Watchtower: Changing the sample period of node %s to %0.1f" %
           (node_name, new_period))
     client.publish(node_name + "/sample_period", str(new_period))
 
@@ -83,7 +83,7 @@ def get_sensor_id(name: str, node: str):
 
 
 def on_connect(client: mqtt.Client, userdata, flags, rc):
-    print("Connected to broker at %s" % cfg.broker_addr)
+    print("Watchtower: Connected to broker at %s" % cfg.broker_addr)
     client.subscribe("/nodes")
 
 
@@ -95,7 +95,7 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         node_topic: str = message.payload.decode()
         node_name = node_topic.split("/")[2]
         if (node_name not in nodes):
-            print("New node detected, subscribing to it with topic %s" %
+            print("Watchtower: New node detected, subscribing to it with topic %s" %
                   node_topic)
             client.subscribe(node_topic + "/#")
             nodes[node_name] = {}
@@ -111,7 +111,7 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         #     pass
         sensor: SensorJSON
         if (sensor_name not in nodes[node_name]):
-            print("Found new sensor (%s) for the node" % sensor_name)
+            print(f"Watchtower: Found new sensor {sensor_name} for the node {node_name}")
             sensor = SensorJSON(message_json)
             sensor.name = sensor_name
             nodes[node_name][sensor_name] = sensor
@@ -122,14 +122,16 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         ts: float = float(message_json["ts"])
         value = float(message_json["value"])
         add_measurement(ts, value, sensor_id, node_id)
-        if (is_outlier(sensor, value=value)):
-            print("Outlier detected: %s (value: %.02f, average: %.02f, std: %.02f)" %
-                  (sensor.name, value, sensor.average, sensor.std))
+        # if (is_outlier(sensor, value=value)):
+        #     print("Watchtower: Outlier detected: %s (value: %.02f, average: %.02f, std: %.02f)" %
+        #           (sensor.name, value, sensor.average, sensor.std))
 
 
 def on_log(client, userdata, level, buf):
-    print("Log: %s" % (buf))
-    pass
+    if level == mqtt.MQTT_LOG_WARNING:
+        print("Warning: %s" % (buf))
+    elif level == mqtt.MQTT_LOG_ERR:
+        print("Error: %s" % (buf))
 
 
 # Create the SQL session
