@@ -11,7 +11,7 @@ csv_safe = "safe.csv"
 nb_std = 4
 
 # MQTT client name
-client_name = "/sentinel/hub"
+client_name = "watchtower_hub"
 
 # MQTT broker address
 # Make sure that this address is the one in the broker certificate

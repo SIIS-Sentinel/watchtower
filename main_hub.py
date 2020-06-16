@@ -85,6 +85,9 @@ def get_sensor_id(name: str, node: str):
 def on_connect(client: mqtt.Client, userdata, flags, rc):
     print("Watchtower: Connected to broker at %s" % cfg.broker_addr)
     client.subscribe("/nodes")
+    for node in nodes.keys():
+        topic = f"/sentinel/{node}/#"
+        client.subscribe(topic)
 
 
 def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
@@ -105,10 +108,7 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         node_name = message.topic.split("/")[2]
         sensor_name: str = message.topic.split("/")[3]
         message_json = json.loads(message.payload.decode("utf-8"))
-        # try:
         node_id = get_node_id(node_name)
-        # except:
-        #     pass
         sensor: SensorJSON
         if (sensor_name not in nodes[node_name]):
             print(f"Watchtower: Found new sensor {sensor_name} for the node {node_name}")
@@ -122,9 +122,6 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         ts: float = float(message_json["ts"])
         value = float(message_json["value"])
         add_measurement(ts, value, sensor_id, node_id)
-        # if (is_outlier(sensor, value=value)):
-        #     print("Watchtower: Outlier detected: %s (value: %.02f, average: %.02f, std: %.02f)" %
-        #           (sensor.name, value, sensor.average, sensor.std))
 
 
 def on_log(client, userdata, level, buf):
