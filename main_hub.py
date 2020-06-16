@@ -98,15 +98,15 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
         node_topic: str = message.payload.decode()
         node_name = node_topic.split("/")[2]
         if (node_name not in nodes):
-            print("Watchtower: New node detected, subscribing to it with topic %s" %
-                  node_topic)
+            print(f"Watchtower: New node detected, subscribing to it with topic {node_topic}")
             client.subscribe(node_topic + "/#")
             nodes[node_name] = {}
             add_node(node_name)
     else:
         # Message announcing a sensor measurement
-        node_name = message.topic.split("/")[2]
-        sensor_name: str = message.topic.split("/")[3]
+        topic_split: list = message.topic.split("/")
+        node_name = topic_split[2]
+        sensor_name: str = topic_split[3]
         message_json = json.loads(message.payload.decode("utf-8"))
         node_id = get_node_id(node_name)
         sensor: SensorJSON
