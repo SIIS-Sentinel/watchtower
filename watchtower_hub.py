@@ -4,7 +4,7 @@ from typing import Dict
 
 import paho.mqtt.client as mqtt
 
-from bookkeeper.sql import create_sessions, Node, Measurement, Event, Sensor
+from bookkeeper.sql import create_sessions, Node, Measurement,  Sensor
 
 
 class SensorJSON():
