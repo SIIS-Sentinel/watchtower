@@ -69,25 +69,28 @@ def sample(entries: list, delta_t: float, client: mqtt.Client = client, initial_
     samples: list = [time.time()]
     # Add all the values to the samples list
     for entry in entries:
-        with open(entry.path, "r") as file:
-            # Take care of the differential variables
-            if entry.differential == 1:
-                raw = float(file.readline().split()[0])
-                if initial_call:
-                    val_buf: float = 0
+        try:
+            with open(entry.path, "r") as file:
+                # Take care of the differential variables
+                if entry.differential == 1:
+                    raw = float(file.readline().split()[0])
+                    if initial_call:
+                        val_buf: float = 0
+                    else:
+                        val_buf = raw - entry.previous_raw
+                    entry.previous_raw = raw
                 else:
-                    val_buf = raw - entry.previous_raw
-                entry.previous_raw = raw
-            else:
-                val_buf = float(file.readline().split()[0])
-            message = json.dumps(
-                {"value": val_buf, "unit": entry.unit, "ts": samples[0], "std": entry.std, "average": entry.average})
-            client.publish(cfg.client_name + entry.topic, message)
-            samples += [val_buf]
+                    val_buf = float(file.readline().split()[0])
+                message = json.dumps(
+                    {"value": val_buf, "unit": entry.unit, "ts": samples[0], "std": entry.std, "average": entry.average})
+                client.publish(cfg.client_name + entry.topic, message)
+                samples += [val_buf]
+        except FileNotFoundError:
+            pass
     # Write the samples to the CSV file
-    with open(cfg.csv_path, "a") as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(samples)
+    # with open(cfg.csv_path, "a") as csv_file:
+    #     csv_writer = csv.writer(csv_file)
+    #     csv_writer.writerow(samples)
     threading.Timer(next_call - time.time(), sample,
                     args=[entries, cfg.sample_period, client]).start()
 
