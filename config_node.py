@@ -1,5 +1,5 @@
 # Watchtower sample period (in s)
-sample_period: float = 10
+sample_period: float = 1
 
 # Output CSV file path (relative to the executable, or absolute)
 csv_path = "out.csv"
