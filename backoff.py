@@ -1,3 +1,5 @@
+# This file contains example code of how to use the drill-down/backoff feature of Watchtower
+
 from config_hub import broker_addr, client_name, ca_cert, certfile, keyfile
 import argparse
 import paho.mqtt.client as mqtt

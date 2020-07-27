@@ -54,12 +54,6 @@ def load_entries(files: list = cfg.files) -> list:
     return entries
 
 
-def is_outlier(entry: Entry, value: float) -> bool:
-    if entry.average is None or entry.std is None:
-        return False
-    return (value > entry.average + cfg.nb_std * entry.std) or (value < entry.average - cfg.nb_std * entry.std)
-
-
 def sample(entries: list, delta_t: float, client: mqtt.Client = client, initial_call: int = 0) -> None:
     """Run one sampling iteration, and creates/runs a timer for the next one"""
     global next_call

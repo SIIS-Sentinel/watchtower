@@ -19,13 +19,6 @@ class SensorJSON():
         self.ts = entry["ts"]
 
 
-def is_outlier(sensor: SensorJSON, value: float):
-    if (sensor.average is None or sensor.std is None):
-        # print("Data missing for an outlier detection")
-        return False
-    return (value > sensor.average + cfg.nb_std * sensor.std) or (value < sensor.average - cfg.nb_std * sensor.std)
-
-
 def update_sample_period(client: mqtt.Client, node_name: str, new_period: float):
     print("Watchtower: Changing the sample period of node %s to %0.1f" %
           (node_name, new_period))
